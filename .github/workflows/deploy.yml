@@ -1,1 +1,40 @@
+name: Deploy to DockerHub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10' 
+        
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt # Adjust to your requirements file
+
+      - name: Run tests
+        run: |
+          python -m pytest # Adjust your testing command
+        
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.LAB_ML_GITHUBACTIONS }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t username/my-python-app:latest .
+          docker push username/my-python-app:latest
 
